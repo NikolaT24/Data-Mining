@@ -56,3 +56,8 @@ search techniques, and optimization algorithms — built for learning, experimen
 - N-Puzzle
 - Tic-Tac-Toe AI
 - Frog Leap Puzzle
+
+<p align="center">
+  <b>👤 Author</b><br>
+  Nikola Topalov
+</p>
