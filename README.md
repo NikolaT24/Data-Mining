@@ -58,6 +58,5 @@ search techniques, and optimization algorithms — built for learning, experimen
 - Frog Leap Puzzle
 
 <p align="center">
-  <b>👤 Author</b><br>
-  Nikola Topalov
+  <b>👤 Author:</b> Nikola Topalov
 </p>
