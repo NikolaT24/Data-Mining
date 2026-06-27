@@ -36,6 +36,7 @@ search techniques, and optimization algorithms — built for learning, experimen
 | 🗳️ `naive-bayes-voting.py` | Naive Bayes classifier for voting records |
 | 🧩 `npuzzle.py` | N-Puzzle solver using **IDA\*** |
 | ❌⭕ `tictactoe.py` | Tic-Tac-Toe AI implementation |
+| 📚 Practicum | Tasks |
 
 ---
 
