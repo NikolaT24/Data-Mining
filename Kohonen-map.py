@@ -10,19 +10,8 @@ def fast_norm(x):
 
 
 class MiniSom(object):
-    def __init__(self, x, y, input_len, sigma=1.0, learning_rate=0.5, decay_function=None, random_seed=None):
-        """
-            Initializes a Self Organizing Maps.
-            x,y - dimensions of the SOM
-            input_len - number of the elements of the vectors in input
-            sigma - spread of the neighborhood function (Gaussian), needs to be adequate to the dimensions of the map.
-            (at the iteration t we have sigma(t) = sigma / (1 + t/T) where T is #num_iteration/2)
-            learning_rate - initial learning rate
-            (at the iteration t we have learning_rate(t) = learning_rate / (1 + t/T) where T is #num_iteration/2)
-            decay_function, function that reduces learning_rate and sigma at each iteration
-                            default function: lambda x,current_iteration,max_iter: x/(1+current_iteration/max_iter)
-            random_seed, random seed to use.
-        """
+    def __init__(self, x, y, input_len, sigma=1.0, learning_rate=0.5, decay_function=None, random_seed=
+                 
         if sigma >= x/2.0 or sigma >= y/2.0:
             warn('Warning: sigma is too high for the dimension of the map.')
         if random_seed:
