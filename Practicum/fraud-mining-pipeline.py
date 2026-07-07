@@ -29,7 +29,7 @@ X, y = make_classification(
     n_classes=2,
     weights=[0.92, 0.08],
     class_sep=1.3,
-    random_state=42
+    random_state=42,
 )
 
 feature_names = [f"feature_{i}" for i in range(X.shape[1])]
@@ -88,13 +88,15 @@ X_train, X_test, y_train, y_test = train_test_split(
     y,
     test_size=0.2,
     random_state=42,
-    stratify=y
+    stratify=y,
 )
 
-preprocessor = Pipeline([
-    ("imputer", SimpleImputer(strategy="median")),
-    ("scaler", StandardScaler())
-])
+preprocessor = Pipeline(
+    [
+        ("imputer", SimpleImputer(strategy="median")),
+        ("scaler", StandardScaler()),
+    ]
+)
 
 X_train_processed = preprocessor.fit_transform(X_train)
 X_test_processed = preprocessor.transform(X_test)
@@ -114,10 +116,12 @@ selector = SelectKBest(score_func=f_classif, k=15)
 selector.fit(X_train_processed, y_train)
 
 selected_features = X.columns[selector.get_support()]
-feature_scores = pd.DataFrame({
-    "Feature": X.columns,
-    "Score": selector.scores_
-}).sort_values(by="Score", ascending=False)
+feature_scores = pd.DataFrame(
+    {
+        "Feature": X.columns,
+        "Score": selector.scores_,
+    }
+).sort_values(by="Score", ascending=False)
 
 print("\nSelected Features")
 print(selected_features.tolist())
@@ -135,31 +139,48 @@ plt.tight_layout()
 plt.show()
 
 models = {
-    "Logistic Regression": Pipeline([
-        ("preprocessor", preprocessor),
-        ("selector", SelectKBest(score_func=f_classif, k=15)),
-        ("model", LogisticRegression(max_iter=1000, class_weight="balanced"))
-    ]),
-    "Support Vector Machine": Pipeline([
-        ("preprocessor", preprocessor),
-        ("selector", SelectKBest(score_func=f_classif, k=15)),
-        ("model", SVC(kernel="rbf", probability=True, class_weight="balanced"))
-    ]),
-    "Decision Tree": Pipeline([
-        ("preprocessor", preprocessor),
-        ("selector", SelectKBest(score_func=f_classif, k=15)),
-        ("model", DecisionTreeClassifier(class_weight="balanced", random_state=42))
-    ]),
-    "Random Forest": Pipeline([
-        ("preprocessor", preprocessor),
-        ("selector", SelectKBest(score_func=f_classif, k=15)),
-        ("model", RandomForestClassifier(n_estimators=300, class_weight="balanced", random_state=42))
-    ]),
-    "Gradient Boosting": Pipeline([
-        ("preprocessor", preprocessor),
-        ("selector", SelectKBest(score_func=f_classif, k=15)),
-        ("model", GradientBoostingClassifier(random_state=42))
-    ])
+    "Logistic Regression": Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            ("selector", SelectKBest(score_func=f_classif, k=15)),
+            ("model", LogisticRegression(max_iter=1000, class_weight="balanced")),
+        ]
+    ),
+    "Support Vector Machine": Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            ("selector", SelectKBest(score_func=f_classif, k=15)),
+            ("model", SVC(kernel="rbf", probability=True, class_weight="balanced")),
+        ]
+    ),
+    "Decision Tree": Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            ("selector", SelectKBest(score_func=f_classif, k=15)),
+            ("model", DecisionTreeClassifier(class_weight="balanced", random_state=42)),
+        ]
+    ),
+    "Random Forest": Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            ("selector", SelectKBest(score_func=f_classif, k=15)),
+            (
+                "model",
+                RandomForestClassifier(
+                    n_estimators=300,
+                    class_weight="balanced",
+                    random_state=42,
+                ),
+            ),
+        ]
+    ),
+    "Gradient Boosting": Pipeline(
+        [
+            ("preprocessor", preprocessor),
+            ("selector", SelectKBest(score_func=f_classif, k=15)),
+            ("model", GradientBoostingClassifier(random_state=42)),
+        ]
+    ),
 }
 
 scoring = {
@@ -167,7 +188,7 @@ scoring = {
     "precision": "precision",
     "recall": "recall",
     "f1": "f1",
-    "roc_auc": "roc_auc"
+    "roc_auc": "roc_auc",
 }
 
 cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -181,17 +202,19 @@ for name, model in models.items():
         y_train,
         scoring=scoring,
         cv=cv,
-        n_jobs=-1
+        n_jobs=-1,
     )
 
-    comparison_rows.append({
-        "Model": name,
-        "Accuracy": scores["test_accuracy"].mean(),
-        "Precision": scores["test_precision"].mean(),
-        "Recall": scores["test_recall"].mean(),
-        "F1": scores["test_f1"].mean(),
-        "ROC_AUC": scores["test_roc_auc"].mean()
-    })
+    comparison_rows.append(
+        {
+            "Model": name,
+            "Accuracy": scores["test_accuracy"].mean(),
+            "Precision": scores["test_precision"].mean(),
+            "Recall": scores["test_recall"].mean(),
+            "F1": scores["test_f1"].mean(),
+            "ROC_AUC": scores["test_roc_auc"].mean(),
+        }
+    )
 
 comparison_df = pd.DataFrame(comparison_rows)
 comparison_df = comparison_df.sort_values(by="ROC_AUC", ascending=False)
@@ -223,21 +246,23 @@ rf_grid = {
     "model__n_estimators": [200, 300, 500],
     "model__max_depth": [None, 5, 10, 15],
     "model__min_samples_split": [2, 5, 10],
-    "model__min_samples_leaf": [1, 2, 4]
+    "model__min_samples_leaf": [1, 2, 4],
 }
 
-rf_pipeline = Pipeline([
-    ("preprocessor", preprocessor),
-    ("selector", SelectKBest(score_func=f_classif)),
-    ("model", RandomForestClassifier(class_weight="balanced", random_state=42))
-])
+rf_pipeline = Pipeline(
+    [
+        ("preprocessor", preprocessor),
+        ("selector", SelectKBest(score_func=f_classif)),
+        ("model", RandomForestClassifier(class_weight="balanced", random_state=42)),
+    ]
+)
 
 rf_search = GridSearchCV(
     estimator=rf_pipeline,
     param_grid=rf_grid,
     scoring="roc_auc",
     cv=cv,
-    n_jobs=-1
+    n_jobs=-1,
 )
 
 rf_search.fit(X_train, y_train)
@@ -266,21 +291,23 @@ gb_grid = {
     "model__n_estimators": [100, 200, 300],
     "model__learning_rate": [0.01, 0.05, 0.1],
     "model__max_depth": [2, 3, 4],
-    "model__subsample": [0.8, 0.9, 1.0]
+    "model__subsample": [0.8, 0.9, 1.0],
 }
 
-gb_pipeline = Pipeline([
-    ("preprocessor", preprocessor),
-    ("selector", SelectKBest(score_func=f_classif)),
-    ("model", GradientBoostingClassifier(random_state=42))
-])
+gb_pipeline = Pipeline(
+    [
+        ("preprocessor", preprocessor),
+        ("selector", SelectKBest(score_func=f_classif)),
+        ("model", GradientBoostingClassifier(random_state=42)),
+    ]
+)
 
 gb_search = GridSearchCV(
     estimator=gb_pipeline,
     param_grid=gb_grid,
     scoring="roc_auc",
     cv=cv,
-    n_jobs=-1
+    n_jobs=-1,
 )
 
 gb_search.fit(X_train, y_train)
@@ -307,7 +334,7 @@ print(roc_auc_score(y_test, gb_probabilities))
 final_models = {
     "Best Base Model": best_base_model,
     "Tuned Random Forest": best_rf,
-    "Tuned Gradient Boosting": best_gb
+    "Tuned Gradient Boosting": best_gb,
 }
 
 final_rows = []
@@ -316,14 +343,16 @@ for name, model in final_models.items():
     predictions = model.predict(X_test)
     probabilities = model.predict_proba(X_test)[:, 1]
 
-    final_rows.append({
-        "Model": name,
-        "Accuracy": accuracy_score(y_test, predictions),
-        "Precision": precision_score(y_test, predictions),
-        "Recall": recall_score(y_test, predictions),
-        "F1": f1_score(y_test, predictions),
-        "ROC_AUC": roc_auc_score(y_test, probabilities)
-    })
+    final_rows.append(
+        {
+            "Model": name,
+            "Accuracy": accuracy_score(y_test, predictions),
+            "Precision": precision_score(y_test, predictions),
+            "Recall": recall_score(y_test, predictions),
+            "F1": f1_score(y_test, predictions),
+            "ROC_AUC": roc_auc_score(y_test, probabilities),
+        }
+    )
 
 final_df = pd.DataFrame(final_rows)
 final_df = final_df.sort_values(by="ROC_AUC", ascending=False)
@@ -356,13 +385,19 @@ threshold_results = []
 for threshold in np.arange(0.1, 0.91, 0.05):
     threshold_predictions = (gb_probabilities >= threshold).astype(int)
 
-    threshold_results.append({
-        "Threshold": threshold,
-        "Accuracy": accuracy_score(y_test, threshold_predictions),
-        "Precision": precision_score(y_test, threshold_predictions, zero_division=0),
-        "Recall": recall_score(y_test, threshold_predictions),
-        "F1": f1_score(y_test, threshold_predictions)
-    })
+    threshold_results.append(
+        {
+            "Threshold": threshold,
+            "Accuracy": accuracy_score(y_test, threshold_predictions),
+            "Precision": precision_score(
+                y_test,
+                threshold_predictions,
+                zero_division=0,
+            ),
+            "Recall": recall_score(y_test, threshold_predictions),
+            "F1": f1_score(y_test, threshold_predictions),
+        }
+    )
 
 threshold_df = pd.DataFrame(threshold_results)
 
@@ -389,10 +424,12 @@ for k in range(2, 12):
     labels = kmeans.fit_predict(X_train_processed)
     score = silhouette_score(X_train_processed, labels)
 
-    kmeans_results.append({
-        "K": k,
-        "Silhouette": score
-    })
+    kmeans_results.append(
+        {
+            "K": k,
+            "Silhouette": score,
+        }
+    )
 
 kmeans_df = pd.DataFrame(kmeans_results)
 
@@ -423,10 +460,7 @@ dbscan_labels = dbscan.fit_predict(X_train_processed)
 print("\nDBSCAN Label Counts")
 print(pd.Series(dbscan_labels).value_counts())
 
-isolation_forest = IsolationForest(
-    contamination=0.08,
-    random_state=42
-)
+isolation_forest = IsolationForest(contamination=0.08, random_state=42)
 
 outlier_labels = isolation_forest.fit_predict(X_train_processed)
 outlier_scores = isolation_forest.decision_function(X_train_processed)
@@ -439,10 +473,7 @@ outlier_df["outlier_score"] = outlier_scores
 print("\nIsolation Forest Outliers")
 print(outlier_df["outlier_label"].value_counts())
 
-lof = LocalOutlierFactor(
-    n_neighbors=20,
-    contamination=0.08
-)
+lof = LocalOutlierFactor(n_neighbors=20, contamination=0.08)
 
 lof_labels = lof.fit_predict(X_train_processed)
 
@@ -454,10 +485,12 @@ feature_importances = best_gb.named_steps["model"].feature_importances_
 selected_mask = best_gb.named_steps["selector"].get_support()
 selected_columns = X.columns[selected_mask]
 
-importance_df = pd.DataFrame({
-    "Feature": selected_columns,
-    "Importance": feature_importances
-}).sort_values(by="Importance", ascending=False)
+importance_df = pd.DataFrame(
+    {
+        "Feature": selected_columns,
+        "Importance": feature_importances,
+    }
+).sort_values(by="Importance", ascending=False)
 
 print("\nFeature Importance")
 print(importance_df)
