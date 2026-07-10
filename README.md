@@ -18,7 +18,7 @@
 
 <p>
 This repository contains implementations of fundamental machine learning models,  
-search techniques, and optimization algorithms — built for learning, experimentation, and clarity.
+search techniques, and optimization algorithms — built for learning, experimentation, and clarity, as well as practicum tasks and a final project.
 </p>
 
 </div>
